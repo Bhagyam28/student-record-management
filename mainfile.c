@@ -1,0 +1,125 @@
+# include <stdio.h>
+# include <string.h>
+
+// creating structure for data storage of large students
+
+struct student_data {
+    char name[256];
+    int roll_number;
+    float marks;
+};
+
+// creating functions for features
+
+void view_data(FILE *p);
+void find_student(FILE *p);
+
+int main(){
+
+    // asking for data
+
+    printf("Enter the number of students you want to add data for\n");
+    int num;
+    scanf("%d",&num);
+
+    // create the required structure 
+
+    struct student_data data[num];
+
+    // storing data
+
+    printf("Enter student data for all students in the specified manner\n");
+    printf("Name, Roll Number and Marks\n");
+    for(int i = 0; i < num; i++)
+    scanf("%s %d %f",data[i].name,&data[i].roll_number,&data[i].marks);
+
+    // creating file
+
+    FILE *p;
+    p = fopen("Data.txt","w");
+    if(p == NULL) printf("Error occured during file creation\n");
+    else{
+        char str[256];
+        int troll;
+        float tmark;
+        int i = 0;
+
+        // entering data and closing file
+
+        fprintf(p,"%-15s %-10s %-5s\n","Name","Roll_No","Marks");
+        while(i != num){
+            fprintf(p,"%-15s %-10d %-5f\n",data[i].name,data[i].roll_number,data[i].marks);
+            i++;
+
+        }
+    }
+    fclose(p);
+
+    // making file permanent
+
+    p = fopen("Data.txt","a+");
+    
+    // Enter your choice
+
+    printf("If you want to read file contents ,Enter 1\n");
+    printf("If you want to search someone, Enter 2\n");
+    
+
+    // implemention features
+
+    int choice;
+    scanf("%d",&choice);
+    if(choice == 1) view_data(p);
+    else if(choice == 2) find_student(p);
+    else printf("Wrong number entered");
+
+}
+
+// displaying all data
+
+void view_data(FILE *p){
+        rewind(p);
+        char ch[256];
+        int troll;
+        float tmarks;
+
+        // skip name, rollnumber and class heading
+
+        fgets(ch, sizeof(ch), p);
+
+        printf("%-15s %-10s %-10s\n", "Name", "Roll_No", "Marks");
+        printf("------------------------------------------\n");
+
+        // prints rest of the data 
+
+    while(fscanf(p,"%s %d %f",ch,&troll,&tmarks) == 3)
+        printf("%-15s %-10d %-5.2f\n",ch,troll,tmarks);
+        fclose(p);
+}
+
+// searching student on the bases of roll number
+
+void find_student(FILE *p){
+
+    // asking for roll number 
+
+    printf("Enter the student's roll number you want to search\t");
+    int s;
+    scanf("%d",&s);
+
+    // giving student data for the given roll number 
+
+    char ch[256];
+    int troll;
+    float tmarks;
+    fgets(ch, sizeof(ch), p);
+
+    printf("%-15s %-10s %-10s\n", "Name", "Roll_No", "Marks");
+    printf("------------------------------------------\n");
+
+    while(fscanf(p,"%s %d %f",ch,&troll,&tmarks) == 3){
+        if(troll == s) printf("%-15s %-10d %-5.2f\n",ch,troll,tmarks);
+    }
+    fclose(p);
+
+}
