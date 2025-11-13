@@ -33,24 +33,29 @@ int main(){
     for(int i = 0; i < num; i++)
     scanf("%s %d %f",data[i].name,&data[i].roll_number,&data[i].marks);
 
-    // creating file
+    // checking duplicates
+
+    int duplicate[256] = {0};
+    for(int i = 0; i < num; i++){
+    for(int j = i+ 1; j < num;j++){
+        if(data[i].roll_number == data[j].roll_number) 
+        duplicate[j] = 1;
+    
+    }
+}
+
+    // making file and storing data without duplicates in file
 
     FILE *p;
     p = fopen("Data.txt","w");
-    if(p == NULL) printf("Error occured during file creation\n");
+    if(p == NULL) printf("Error occured during file opening");
     else{
-        char str[256];
-        int troll;
-        float tmark;
+        fprintf(p,"%-15s %-10s %-5s\n", "Name", "Roll_No", "Marks");
         int i = 0;
-
-        // entering data and closing file
-
-        fprintf(p,"%-15s %-10s %-5s\n","Name","Roll_No","Marks");
         while(i != num){
-            fprintf(p,"%-15s %-10d %-5f\n",data[i].name,data[i].roll_number,data[i].marks);
-            i++;
-
+        if(duplicate[i] == 0)
+        fprintf(p,"%-15s %-10d %-5f\n", data[i].name, data[i].roll_number, data[i].marks);
+        i++;
         }
     }
     fclose(p);
@@ -63,7 +68,6 @@ int main(){
 
     printf("If you want to read file contents ,Enter 1\n");
     printf("If you want to search someone, Enter 2\n");
-    
 
     // implemention features
 
@@ -107,7 +111,7 @@ void find_student(FILE *p){
     int s;
     scanf("%d",&s);
 
-    // giving student data for the given roll number 
+    // giving student data for the given 
 
     char ch[256];
     int troll;
