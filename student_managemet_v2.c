@@ -1,0 +1,195 @@
+# include <stdio.h>
+# include <string.h>
+
+// creating structure for data storage of large students
+
+struct student_data {
+    char name[256];
+    int roll_number;
+    float marks;
+};
+
+// creating functions for features
+
+void view_data(FILE *p);
+void find_student(FILE *p);
+void delete_student(FILE *p,int num);
+
+int main(){
+
+    // asking for data
+
+    printf("Enter the number of students you want to add data for\n");
+    int num;
+    scanf("%d",&num);
+
+    // create the required structure 
+
+    struct student_data data[num];
+
+    // storing data
+
+    printf("Enter student data for all students in the specified manner\n");
+    printf("Name, Roll Number and Marks\n");
+    for(int i = 0; i < num; i++)
+    scanf("%s %d %f",data[i].name,&data[i].roll_number,&data[i].marks);
+
+    // checking duplicates
+
+    int duplicate[256] = {0};
+    for(int i = 0; i < num; i++){
+    for(int j = i+ 1; j < num;j++){
+        if(data[i].roll_number == data[j].roll_number) 
+        duplicate[j] = 1;
+    
+    }
+}
+
+    // sorting the data on basis of roll number
+
+    for(int i = 0; i < num; i++){
+        for(int j = 0; j < num - i - 1 ; j++){
+            if(data[j].roll_number > data[j + 1].roll_number){
+                struct student_data temp;
+                temp = data[j];
+                data[j] = data[j + 1];
+                data[j + 1] = temp;
+            }
+
+        }
+    }
+
+    // making file and storing data without duplicates in file
+
+    FILE *p;
+    p = fopen("Data.txt","w");
+    if(p == NULL) printf("Error occured during file opening");
+    else{
+        fprintf(p,"%-15s %-10s %-5s\n", "Name", "Roll_No", "Marks");
+        int i = 0;
+        while(i != num){
+        if(duplicate[i] == 0)
+        fprintf(p,"%-15s %-10d %-5f\n", data[i].name, data[i].roll_number, data[i].marks);
+        i++;
+        }
+    }
+    fclose(p);
+
+    // making file permanent
+
+    p = fopen("Data.txt","a+");
+    
+    // Enter your choice
+
+    printf("If you want to read file contents ,Enter 1\n");
+    printf("If you want to search someone, Enter 2\n");
+    printf("If you want to delete a student date, Enter 3\n");
+
+    // implemention features
+
+    int choice;
+    scanf("%d",&choice);
+    switch(choice){
+        case 1:
+        view_data(p);
+        break;
+        case 2:
+        find_student(p);
+        break;
+        case 3:
+        delete_student(p,num);
+        break;
+        default:
+        printf("Wrong number entered");
+        break;
+    }
+}
+
+// displaying all data
+
+void view_data(FILE *p){
+        rewind(p);
+        char ch[256];
+        int troll;
+        float tmarks;
+
+        // skip name, rollnumber and class heading
+
+        fgets(ch, sizeof(ch), p);
+
+        printf("%-15s %-10s %-10s\n", "Name", "Roll_No", "Marks");
+        printf("------------------------------------------\n");
+
+        // prints rest of the data 
+
+    while(fscanf(p,"%s %d %f",ch,&troll,&tmarks) == 3)
+        printf("%-15s %-10d %-5.2f\n",ch,troll,tmarks);
+        fclose(p);
+}
+
+// searching student on the bases of roll number
+
+void find_student(FILE *p){
+
+    // asking for roll number 
+
+    printf("Enter the student's roll number you want to search\t");
+    int s;
+    scanf("%d",&s);
+
+    // giving student data for the given 
+
+    char ch[256];
+    int troll;
+    float tmarks;
+    fgets(ch, sizeof(ch), p);
+
+    printf("%-15s %-10s %-10s\n", "Name", "Roll_No", "Marks");
+    printf("------------------------------------------\n");
+
+    while(fscanf(p,"%s %d %f",ch,&troll,&tmarks) == 3){
+        if(troll == s) printf("%-15s %-10d %-5.2f\n",ch,troll,tmarks);
+    }
+    fclose(p);
+
+}
+
+// deteting student data 
+
+void delete_student(FILE *p, int num){
+
+    // asking for roll number
+
+    printf("Enter the roll number you want to remove\n");
+    int del;
+    scanf("%d",&del);
+
+    // creating new file
+
+    FILE *r;
+    r = fopen("Temp.txt","w");
+    fprintf(r,"%-15s %-10s %-5s\n", "Name", "Roll_No", "Marks");
+
+    // borrowing data from original file and putting it into new file
+
+    char ch[356];
+    int troll,i = 0;
+    float tmarks;
+    fgets(ch, sizeof(ch), p);
+    while(i < num && fscanf(p, "%s %d %f", ch, &troll, &tmarks) == 3) {
+        if(troll != del) fprintf(r,"%-15s %-10d %-5f\n",ch,troll,tmarks);
+        i++;
+    }
+    fclose(p);
+    fclose(r);
+
+    // renaming the file 
+
+    remove("Data.txt");
+    rename("Temp.txt","Data.txt");
+
+    // making file permanent
+
+    r = fopen("Data.txt","a+");
+    
+}
